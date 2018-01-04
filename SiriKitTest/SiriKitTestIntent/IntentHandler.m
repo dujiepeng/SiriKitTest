@@ -7,6 +7,7 @@
 //
 
 #import "IntentHandler.h"
+#import <Hyphenate/Hyphenate.h>
 
 // As an example, this class is set up to handle Message intents.
 // You will want to replace this or add other intents as appropriate.
@@ -31,10 +32,47 @@
 #pragma mark - INSendMessageIntentHandling
 // 必须实现，在Siri操作界面点击Send的时候，会回调到该方法。
 - (void)handleSendMessage:(INSendMessageIntent *)intent completion:(void (^)(INSendMessageIntentResponse *response))completion {
+    
     // Implement your application logic to send a message here.
+    EMOptions *options = [EMOptions optionsWithAppkey:@"easemob-demo#chatdemoui"];
+    options.enableConsoleLog = YES;
+    [EMClient.sharedClient initializeSDKWithOptions:options];
+    
+    __block INSendMessageIntentResponseCode code = INSendMessageIntentResponseCodeFailure;
+    
+    // 获取到数据
+    NSString *toUsername = intent.recipients.lastObject.displayName;
+    NSString *text = intent.content;
+    
+    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+    
+    // 此处需要得到登录账号
+    [EMClient.sharedClient loginWithUsername:@"du003" password:@"1" completion:^(NSString *aUsername, EMError *aError) {
+        if (!aError) {
+            EMTextMessageBody *body = [[EMTextMessageBody alloc] initWithText:text];
+            EMMessage *msg = [[EMMessage alloc] initWithConversationID:toUsername
+                                                                  from:@"du003"
+                                                                    to:toUsername
+                                                                  body:body
+                                                                   ext:nil];
+            [EMClient.sharedClient.chatManager sendMessage:msg progress:nil completion:
+             ^(EMMessage *message, EMError *error) {
+                 if (!error) {
+                     code = INSendMessageIntentResponseCodeSuccess;
+                 }
+                 dispatch_semaphore_signal(semaphore);
+             }];
+        }else {
+            dispatch_semaphore_signal(semaphore);
+        }
+    }];
     
     NSUserActivity *userActivity = [[NSUserActivity alloc] initWithActivityType:NSStringFromClass([INSendMessageIntent class])];
-    INSendMessageIntentResponse *response = [[INSendMessageIntentResponse alloc] initWithCode:INSendMessageIntentResponseCodeSuccess userActivity:userActivity];
+    
+    // 等待10秒
+    dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, 10 * NSEC_PER_SEC));
+    
+    INSendMessageIntentResponse *response = [[INSendMessageIntentResponse alloc] initWithCode:code userActivity:userActivity];
     completion(response);
 }
 
