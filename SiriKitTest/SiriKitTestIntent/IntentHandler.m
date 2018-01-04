@@ -29,8 +29,7 @@
 }
 
 #pragma mark - INSendMessageIntentHandling
-// Handle the completed intent (required).
-
+// 必须实现，在Siri操作界面点击Send的时候，会回调到该方法。
 - (void)handleSendMessage:(INSendMessageIntent *)intent completion:(void (^)(INSendMessageIntentResponse *response))completion {
     // Implement your application logic to send a message here.
     
