@@ -69,8 +69,8 @@
     
     NSUserActivity *userActivity = [[NSUserActivity alloc] initWithActivityType:NSStringFromClass([INSendMessageIntent class])];
     
-    // 等待10秒
-    dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, 10 * NSEC_PER_SEC));
+    // 等待30秒，如果没有返回，会出现超时，之后siri会表现为“让我再想想”之类的情况。
+    dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, 30 * NSEC_PER_SEC));
     
     INSendMessageIntentResponse *response = [[INSendMessageIntentResponse alloc] initWithCode:code userActivity:userActivity];
     completion(response);
