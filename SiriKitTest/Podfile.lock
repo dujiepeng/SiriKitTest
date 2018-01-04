@@ -1,0 +1,12 @@
+PODS:
+  - Hyphenate (3.3.7)
+
+DEPENDENCIES:
+  - Hyphenate (~> 3.3.7)
+
+SPEC CHECKSUMS:
+  Hyphenate: 81e9566bf45e2c8a4a24a7750c9eeab25ad7497b
+
+PODFILE CHECKSUM: 2bf1a9d42c5339b3727921c108345fcfa79131ec
+
+COCOAPODS: 1.2.1
